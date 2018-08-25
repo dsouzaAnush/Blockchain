@@ -1,21 +1,29 @@
 # -*- coding: utf-8 -*-
+#Creates a cryptocurrency
 import datetime
 import hashlib
 import json
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+import requests
+from uuid import uuid4
+from urllib.parse import urlparse
 
-#build a blockchAIN
+# Part 1 : build a blockchain
 class Blockchain:
     
     def __init__(self):
         self.chain = []
+        self.transactions = []#list of transactions for every block
         self.create_block(proof = 1, previous_hash = '0')
+        self.nodes = set()
         
     def create_block(self, proof, previous_hash):
         block = {'index': len(self.chain) + 1,
                  'timestamp': str(datetime.datetime.now()),
                  'proof': proof,
-                 'previous_hash': previous_hash}
+                 'previous_hash': previous_hash,
+                 'transactions': self.transactions}
+        self.transactions = []#because transacations is added to main ledger
         self.chain.append(block)
         return block
     
@@ -53,8 +61,17 @@ class Blockchain:
             block_index += 1
         return True
     
+    def add_transaction(self, sender, reciever, amount):
+        self.transactions.append({'sender': sender,
+                                  'reciever':reciever,
+                                  'amount': amount})
+        previous_block = self.get_previous_block()
+        return previous_block['index'] + 1
 
-#mine the blockchain
+    def add_node(self, address):
+        parsed_url = urlparse(address)
+        self.nodes.add(parsed_url.netloc)
+#Part 2 : mine the blockchain
 
 #create flask web app
 app = Flask(__name__)
