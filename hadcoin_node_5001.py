@@ -81,7 +81,7 @@ class Blockchain:
             if response.status_code == 200:
                 length = response.json()['length']
                 chain = response.json()['chain']
-                if length > max_length and self.is_chain_valid(chain):
+                if length > max_length and self.is_cshain_valid(chain):
                     max_length = length
                     longest_chain = chain
         if longest_chain:
@@ -107,7 +107,7 @@ def mine_block():
     previous_proof = previous_block['proof']
     proof = blockchain.proof_of_work(previous_proof)
     previous_hash = blockchain.hash(previous_block)
-    blockchain.add_transaction(sender = node_address, reciever = 'XYZ', amount = 1)
+    blockchain.add_transaction(sender = node_address, receiver = 'me', amount = 1)
     block = blockchain.create_block(proof, previous_hash)
     response = {'message': 'Congrats on mining a new block',
                 'index': block['index'],
@@ -140,7 +140,7 @@ def add_transaction():
     transaction_keys = ['sender', 'receiver', 'amount']
     if not all (key in json for key in transaction_keys):
         return 'Part of transaction are missing', 400
-    index = blockchain.add_transaction(json['sender'], json['reciever'], json['amount'])
+    index = blockchain.add_transaction(json['sender'], json['receiver'], json['amount'])
     response = {'message': f'This Transaction will be in block {index}'}
     return jsonify(response), 201
 
@@ -172,4 +172,6 @@ def replace_chain():
     return jsonify(response), 200
 
 #run the app
-app.run(host = '0.0.0.0', port = 5000)
+app.run(host = '0.0.0.0', port = 5001)
+
+
